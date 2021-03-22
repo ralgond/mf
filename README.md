@@ -9,4 +9,4 @@ git clone git@github.com:ralgond/mf.git
 
 cd mf
 
-python als.py
+python als-wr.py
