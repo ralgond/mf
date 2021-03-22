@@ -1,5 +1,5 @@
 # mf
-Matrix Factorization library includes algorithm ALS.
+Matrix Factorization library includes algorithm ALS-WR.
 
 ## Software Requirements
 Python3
