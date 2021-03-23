@@ -4,17 +4,10 @@ import random
 import movielens_data
 
 md = movielens_data.MovielensData('data/movie_rating.csv')
-all_data = md.data
 
-# Create training and test matrix
-R = np.zeros((md.n_users+1, md.n_items+1))
-T = np.zeros((md.n_users+1, md.n_items+1))
-random.seed(0)
-for line in all_data.itertuples():
-    if (random.random() < 0.8):
-        R[line[1], line[2]] = line[3]
-    else:
-        T[line[1], line[2]] = line[3]  
+# training and test matrix
+R = md.R
+T = md.T
 
 
 # Index matrix for training data
