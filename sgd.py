@@ -21,22 +21,30 @@ def rmse(I,R,U,M):
     return np.sqrt(np.sum((I * (R - np.dot(U,M.T)))**2)/len(R[R > 0]))
 
 class SdgMF():
-    def __init__(self, ratings, rank=20, reg=0.1, n_iter=10, learning_rate=0.001):
-        self.ratings = ratings
-        self.n_users, self.n_items = ratings.shape
+    def __init__(self, R, T, rank=20, reg=0.1, n_iter=10, learning_rate=0.001):
+        self.R = R
+        self.T = T
+        self.n_users, self.n_items = R.shape
         self.rank = rank
         self.reg = reg
         self.n_iter = n_iter
         self.learning_rate = learning_rate
 
-        self.sample_row, self.sample_col = self.ratings.nonzero()
+        self.sample_row, self.sample_col = self.R.nonzero()
 
         # Index matrix for training data
-        I = self.ratings.copy()
+        I = self.R.copy()
         I[I > 0] = 1
         I[I == 0] = 0
 
         self.I = I
+
+        # Index matrix for test data
+        I2 = self.T.copy()
+        I2[I2 > 0] = 1
+        I2[I2 == 0] = 0
+
+        self.I2 = I2
 
     def train(self):
         self.user_vecs = np.random.rand(self.n_users, self.rank)
@@ -45,12 +53,14 @@ class SdgMF():
         for iter in range(self.n_iter):
             self.sdg()
 
-            print(rmse(self.I, self.ratings, self.user_vecs, self.item_vecs))
+            train_rmse = rmse(self.I, self.R, self.user_vecs, self.item_vecs)
+            test_rmse = rmse(self.I2, self.T, self.user_vecs, self.item_vecs)
+            print("tran_rsme:", train_rmse, "test_rmse:", test_rmse)
     
     def sdg(self):
         for idx in range(len(self.sample_row)):
             u, i = self.sample_row[idx], self.sample_col[idx]
-            e = self.ratings[u, i] - self.user_vecs[u,:].dot(self.item_vecs[i,:].T)
+            e = self.R[u, i] - self.user_vecs[u,:].dot(self.item_vecs[i,:].T)
 
             self.user_vecs[u, :] += self.learning_rate * \
                     (e*self.item_vecs[i,:]- self.reg*self.user_vecs[u,:]) 
@@ -60,5 +70,5 @@ class SdgMF():
 
 if __name__ == "__main__":
     md = movielens_data.MovielensData('data/movie_rating.csv')
-    mf = SdgMF(md.R, learning_rate=0.001)
+    mf = SdgMF(md.R, md.T, n_iter=20, learning_rate=0.001)
     mf.train()
