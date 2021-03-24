@@ -31,6 +31,7 @@ class SdgMF():
         self.learning_rate = learning_rate
 
         self.sample_row, self.sample_col = self.R.nonzero()
+        self.n_samples = len(self.sample_row)
 
         # Index matrix for training data
         I = self.R.copy()
@@ -49,7 +50,8 @@ class SdgMF():
     def train(self):
         self.user_vecs = np.random.rand(self.n_users, self.rank)
         self.item_vecs = np.random.rand(self.n_items, self.rank)
-
+        
+        np.random.seed(0)
         for iter in range(self.n_iter):
             self.sdg()
 
@@ -58,7 +60,9 @@ class SdgMF():
             print("tran_rsme:", train_rmse, "test_rmse:", test_rmse)
     
     def sdg(self):
-        for idx in range(len(self.sample_row)):
+        training_indices = np.arange(self.n_samples)
+        np.random.shuffle(training_indices)
+        for idx in training_indices:
             u, i = self.sample_row[idx], self.sample_col[idx]
             e = self.R[u, i] - self.user_vecs[u,:].dot(self.item_vecs[i,:].T)
 
