@@ -1,21 +1,6 @@
 import numpy as np
 import movielens_data
 
-def RMSE(R, R2):
-    t_m = ((R-R2)**2)
-    sum = 0.
-    not_zero_cnt = 0
-    rows = R.shape[0]
-    cols = R.shape[1]
-    for r in range(rows):
-        for c in range(cols):
-            if (R[r][c] != 0.):
-                sum += t_m[r][c]
-                not_zero_cnt += 1
-    return np.sqrt(sum/not_zero_cnt)
-
-
-
 # Calculate the RMSE
 def rmse(I,R,U,M):
     return np.sqrt(np.sum((I * (R - np.dot(U,M.T)))**2)/len(R[R > 0]))
